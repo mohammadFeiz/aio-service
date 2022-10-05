@@ -1,0 +1,24 @@
+{
+  "name": "aio-service",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "aio-date": "^1.0.2",
+    "jquery": "3.6.1",
+    "axios": "^0.27.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mohammadFeiz/aio-service.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mohammadFeiz/aio-service/issues"
+  },
+  "homepage": "https://github.com/mohammadFeiz/aio-service#readme"
+}
