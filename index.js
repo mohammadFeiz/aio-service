@@ -1,7 +1,7 @@
 import Axios from "axios";
 import AIODate from "aio-date";
 import $ from "jquery";
-export default function services({getState,apis}) {
+export default function services({getState,apis,token}) {
   function getDateAndTime(value){
     let dateCalculator = AIODate();
     let adate,atime;
@@ -19,7 +19,19 @@ export default function services({getState,apis}) {
     try{return value.replace(/ك/g, "ک").replace(/ي/g, "ی");}
     catch{return value}
   }
-  return Service(apis({Axios,getState,getDateAndTime,arabicToFarsi}))
+  let reqInstance;
+  if(token){
+    reqInstance = Axios.create({
+      headers: {
+        Authorization : `Bearer ${token}`
+      }
+    })
+  }
+  else{
+    reqInstance = Axios;
+  }
+  
+  return Service(apis({Axios:reqInstance,getState,getDateAndTime,arabicToFarsi}),token)
 }
 
 
