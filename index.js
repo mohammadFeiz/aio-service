@@ -108,7 +108,7 @@ function Service(services,validations,defaults) {
       let message = validation(result);
       if(typeof message === 'string'){
         AIOServiceShowAlert({type:'error',text:`apis().${type}`,subtext:message});
-        result = defaults[type]
+        result = defaults[type] === undefined?result:defaults[type];
       }
     }
     return result;
