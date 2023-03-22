@@ -1,15 +1,16 @@
 {
   "name": "aio-service",
-  "version": "4.0.2",
+  "version": "5.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "aio-date": "^1.2.0",
     "jquery": "3.6.1",
-    "axios": "^0.27.2"
+    "aio-date": "^3.0.0",
+    "aio-storage": "^3.0.0",
+    "axios": "^1.2.1"
   },
   "repository": {
     "type": "git",

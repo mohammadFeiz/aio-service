@@ -1,5 +1,6 @@
 import Axios from "axios";
 import AIODate from "aio-date";
+import AIOStorage from 'aio-storage';
 import './index.css';
 import $ from "jquery";
 function AIOServiceShowAlert(obj = {}){
@@ -45,73 +46,144 @@ function AIOServiceShowAlert(obj = {}){
       $('.' + dui).remove()
   }})
 }
-export default function services({getState,apis,token,validations = {},defaults = {}}) {
+export default function services({getState,apis,token,loader,baseUrl,id}) {
+  if(typeof id !== 'string'){console.error('aio-storage => id should be an string, but id is:',id); return;}
   function getDateAndTime(value){
-    let dateCalculator = AIODate();
-    let adate,atime;
-    try {
-      if (value.indexOf("T") !== -1) {atime = value.split("T")[1].split(".")[0];} 
-      else {atime = value.split(" ")[1];}
-    } 
-    catch {atime = undefined;}
-    try {adate = dateCalculator.gregorianToJalali(value).join("/");
-    } 
-    catch {adate = "";}
-    return {date:adate,time:atime}
+    let res = AIODate().toJalali({date:value});
+    let [year,month,day,hour,minute] = res;
+    return {date:`${year}/${month}/${day}`,time:`${hour}:${minute}`}
   }
   function arabicToFarsi(value){
     try{return value.replace(/ك/g, "ک").replace(/ي/g, "ی");}
     catch{return value}
   }
-  let reqInstance;
-  if(token){reqInstance = Axios.create({headers: {Authorization : `Bearer ${token}`}})}
-  else{reqInstance = Axios;}
-  return Service(apis({Axios:reqInstance,getState,getDateAndTime,arabicToFarsi,token,AIOServiceShowAlert}),validations,defaults)
+  if(token){
+    Axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  }
+  return Service(apis({Axios,getState,getDateAndTime,arabicToFarsi,token,AIOServiceShowAlert,baseUrl}),loader,id)
 }
 
+function AIOServiceLoading(id){
+  return (`
+    <div class="aio-service-loading" id="${id}">
+      <div class="aio-service-loading-0">
+        <div class="aio-service-loading-1">
+          <div class="aio-service-loading-2" style="animation: 1s ease-in-out 0.0s infinite normal none running aioserviceloading;"></div>
+          <div class="aio-service-loading-2" style="animation: 1s ease-in-out 0.1s infinite normal none running aioserviceloading;"></div>
+          <div class="aio-service-loading-2" style="animation: 1s ease-in-out 0.2s infinite normal none running aioserviceloading;"></div>
+          <div class="aio-service-loading-2" style="animation: 1s ease-in-out 0.3s infinite normal none running aioserviceloading;"></div>
+          <div class="aio-service-loading-2" style="animation: 1s ease-in-out 0.4s infinite normal none running aioserviceloading;"></div>
+        </div>
+      </div>
+    </div>
+  `)
+}
 
-
-function Service(services,validations,defaults) {
-  function getFromCache(key, minutes) {
-    if (minutes === true) { minutes = Infinity }
-    let storage = localStorage.getItem(key);
-    if (storage === undefined || storage === null) { return false }
-    let { time, data } = JSON.parse(storage);
-    if ((new Date().getTime() / 60000) - (time / 60000) > minutes) { return false }
-    return data;
-  }
-  function setToCache(key, data) {
-    let time = new Date().getTime();
-    localStorage.setItem(key, JSON.stringify({ time, data }))
-  }
-  return async ({ type, parameter, loading = true, cache, cacheName }) => {
-    if (loading) {$(".loading").css("display", "flex"); }
-    if (cache) {
-      let a = getFromCache(cacheName ? 'storage-' + cacheName : 'storage-' + type, cache);
-      if (a !== false) {
-        $(".loading").css("display", "none");
-        return a
-      }
-      if (!services[type]) {debugger;}
-      let result = await services[type](parameter);
-      $(".loading").css("display", "none");
-      setToCache(cacheName ? 'storage-' + cacheName : 'storage-' + type, result);
-      return result;
-    }
-    if (!services[type]) {alert('services.' + type + ' is not define')}
-    let result;
-    try{result = await services[type](parameter);}
-    catch{result = defaults[type];} 
-    $(".loading").css("display", "none");
-    let validation = validations[type];
+function Service(services,loader,id) {
+  function validate(result,{validation,api,def,errorMessage,successMessage}){
     if(validation){
-      let message = validation(result);
+      let message = JSONValidator(result,validation);
       if(typeof message === 'string'){
-        AIOServiceShowAlert({type:'error',text:`apis().${type}`,subtext:message});
-        result = defaults[type] === undefined?result:defaults[type];
+        AIOServiceShowAlert({type:'error',text:`apis().${api}`,subtext:message});
+        return def;
       }
     }
+    if(typeof result === 'string'){
+      if(errorMessage){
+        AIOServiceShowAlert({type:'error',text:typeof errorMessage === 'function'?errorMessage():errorMessage,subtext:result});
+      }
+      return def
+    }
+    if(successMessage && result !== undefined){
+      successMessage = typeof successMessage === 'function'?successMessage():successMessage
+      if(!Array.isArray(successMessage)){successMessage = [successMessage]}
+      AIOServiceShowAlert({type:'success',text:successMessage[0],subtext:successMessage[1]});
+    }
+    return result;
+  }
+  
+  async function fetchData(obj){
+    let {api,parameter,cache,loading,loadingParent,cacheName,def} = obj;
+    if (!services[api]) {alert('services.' + api + ' is not define'); return;}
+    let result;
+    if (cache) {
+      if(isNaN(cache)){console.error('aio-storage => cache should be a number, but cache is:',cache); return;}
+      let storage = AIOStorage(id);
+      let result = storage.load({name:cacheName ? 'storage-' + cacheName : 'storage-' + api,time:cache})
+      if(result !== undefined){return result}
+    }
+    if(loading){$(loadingParent).append(typeof loader === 'function'?loader():AIOServiceLoading(api));}  
+    try{result = await services[api](parameter);}
+    catch(err){AIOServiceShowAlert({type:'error',text:`apis().${api}`,subtext:err.message});}
+    if(loading){
+      let loadingDom = $('#' + api);
+      if(!loading.length){loadingDom = $('.aio-service-loading')}
+      loadingDom.remove()
+    }
+    return result === undefined?def:result;
+  }
+  return async (obj) => {
+    let { callback = ()=>{},cache,cacheName,api} = obj;
+    let result = await fetchData(obj);
+    result = validate(result,obj);
+    if (cache) {AIOStorage(id).save({name:cacheName ? 'storage-' + cacheName : 'storage-' + api,value:result})}
+    callback(result);
     return result;
   }
 }
 
+function JSONValidator(json,config){
+  let obj = {
+    getType(value){
+        let type = typeof value;
+        if(Array.isArray(value)){type = 'array'}
+        return type
+    },
+    checkType_req(config,res,resultText,shouldBe){
+      if(typeof config === 'function'){config = config(res)}
+      if(Array.isArray(config)){
+        if(this.getType(res) !== 'array'){
+          return `AIOService validation error. ${resultText} is ${this.getType(res)} ${shouldBe !== undefined?` but should be ${JSON.stringify(shouldBe)}`:''}`
+        }
+        for(let i = 0; i < res.length; i++){
+          let o = res[i];
+          let result = this.checkType(config[0],o,`${resultText}[${i}]`,config[0])
+          if(result){
+              return result
+          }
+        }
+      }
+      else if(typeof config === 'object'){
+        if(this.getType(res) !== 'object'){
+          return `AIOService validation error. ${resultText} is ${this.getType(res)} ${shouldBe !== undefined?` but should be ${JSON.stringify(shouldBe)}`:''}`
+        }
+        for(let prop in config){
+          let result = this.checkType(config[prop],res[prop],prop,config[prop])
+          if(result){
+            return result
+          }
+        }
+      }
+      else if(config !== this.getType(res)){
+        return `AIOService validation error. ${resultText} is ${JSON.stringify(res)} ${shouldBe !== undefined?` but should be ${JSON.stringify(shouldBe)}`:''}`
+      }
+    },
+    checkType(config,res,resultText = 'result'){
+      if(typeof config === 'string' && config.indexOf(',') !== -1){
+        config = config.split(',');
+        let finalResult;
+        let isThereError = true;
+        for(let i = 0; i < config.length; i++){
+          let result = this.checkType_req(config[i],res,resultText,config)
+          if(result){finalResult = result}
+          else{isThereError = false}
+        }
+        if(isThereError){return finalResult}
+      }
+      else{
+        return this.checkType_req(config,res,resultText,config)
+      }
+    }
+  }
+  return obj.checkType(config,json)
+}
