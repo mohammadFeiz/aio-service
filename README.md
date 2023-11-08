@@ -53,7 +53,7 @@ this.setState({apis});
 
 > getApiFunctions Provides an object as an input parameter contain below properties:
 - `Axios` Axios dependecy for requests , use this for prevent import it
-- `baseUrl` base url (in creation of instance).
+- `baseUrl` base url (which was defined when the instance was created).
 
 > each functin take 2 parameters :
 - `parameter` is parameter of function that you can call api function by it.
