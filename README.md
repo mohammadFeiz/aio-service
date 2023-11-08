@@ -83,8 +83,14 @@ function myApiFunctions({Axios,baseUrl}){
 ```
 # 1 - instance methods(request)
 `apis.request` in all over of your app wherever you have access to instance of AIOService class, you can call api functions by call instance.request method
+`api-functions.js`
 ``` javascript
 const apis = new AIOService({...});
+export default apis;
+```
+`app.js`
+``` javascript
+let {apis} = useContext(...)
 let res = await apis.request({
     api:'getMyOrders',
     parameter:0,
