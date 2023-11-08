@@ -1,4 +1,13 @@
 # aio-service is a javascript dependency for handle all apis and server requests in your application
+##### aio-service is an useful class for develop all api requests in one place in one ore more js files.
+##### In this way, you write all functions related to requests in one file as methods of an object. And throughout the program you call them with the desired features and properties.
+##### You can divide the app requests into several parts in separate files and finally introduce them to the app through one file.
+##### Easily and just by setting a variable, you can save the answers to the requests for a certain period of time so that the answers are read from the memory for the next time and do not request the server again.
+##### This module automatically displays page loaders and message boxes, and you can easily display existing errors.
+##### Through this module, you can specify how to read server errors by configuring it once, and during the application, errors and server messages will be displayed automatically.
+##### You don't need to use catch, this is done by the module itself with the definition you make for it.
+##### You can manage the frontend and backend synchronization operations in one file so that the backend developer alone can do this from the fake data you define.
+
 # install
 ``` javascript
 npm i aio-service
