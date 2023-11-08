@@ -82,7 +82,7 @@ function myApiFunctions({Axios,baseUrl}){
 }
 ```
 # 1 - instance methods(request)
-`apis.request` in all over of your app wherever you have access to instance of AIOService class, you can call api functions by call instance.request method
+`apis.request` in all over of your app wherever you have access to instance of AIOService class, you can call api functions by call instance.request method <br>
 `api-functions.js`
 ``` javascript
 const apis = new AIOService({...});
@@ -116,7 +116,7 @@ let res = await apis.request({
     getError:(response)=>!response.data.isSuccess?response.data.message
 })
 ```
-- `api` required - name of api function that writed in getMyApiFunction return object
+- `api` required - name of api function that writed in getMyApiFunctions returned object
 - `parameter` value that api function will take as parameter (in this example 0)
 - `description` description of action. use in generate alert messages
 - `onSuccess` optional - A function that is called with the result if the request is successful. dont need async and await
