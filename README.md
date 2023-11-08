@@ -1,7 +1,7 @@
 # aio-service is a dependency for handle all apis and server requests in your application
 # install
-npm i aio-service
 ``` javascript
+npm i aio-service
 ```
 # import
 ``` javascript
