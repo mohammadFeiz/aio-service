@@ -57,7 +57,7 @@ this.setState({apis});
 
 > each functin take 2 parameters :
 - `parameter` is parameter of function that you can call api function by it.
-- `appState` is return result of getState function. this is for read app information in all api functions for prevent send any thing to these functions.
+- `appState` is return result of getState function. this is for read app information in all api functions for prevent send anymore thing to these functions as parameter.
 
 > each function should returns an object contain :
 - `response` return response for error handling.
