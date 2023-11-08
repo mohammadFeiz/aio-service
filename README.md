@@ -9,7 +9,7 @@ import AIOService from 'aio-service';
 ```
 # create instance
 ``` javascript
-import myApiFunctions from './my-api-function';
+import myApiFunctions from './my-api-functions';
 
 let apis = new AIOService({
     id:'my app',
