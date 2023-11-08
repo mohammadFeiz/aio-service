@@ -38,7 +38,7 @@ let apis = new AIOService({
 
 this.setState({apis});
 ```
-- `id` required - string - should set a uniq id.
+- `id` required - string - should set an uniq id.
 - `getApiFunctions` required - function - returns an object contain api functions
 - `token` optional - string - this token will set on all requests
 - `baseUrl` optional - string - set base url
