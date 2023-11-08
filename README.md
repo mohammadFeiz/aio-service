@@ -51,7 +51,7 @@ this.setState({apis});
 
 > in your project you can write all requests in this function and you can call them in all over your app.
 
-> getApiFunctions get an object as parameter contain:
+> getApiFunctions Provides an object as an input parameter contain below properties:
 - `Axios` Axios dependecy for requests , use this for prevent import it
 - `baseUrl` base url (in creation of instance).
 
