@@ -1,6 +1,6 @@
 {
   "name": "aio-service",
-  "version": "6.1.0",
+  "version": "6.1.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -9,7 +9,7 @@
   "dependencies": {
     "jquery": "3.6.1",
     "aio-date": "^3.0.0",
-    "aio-storage": "^3.0.0",
+    "aio-storage": "^4.0.1",
     "axios": "^1.2.1"
   },
   "repository": {
