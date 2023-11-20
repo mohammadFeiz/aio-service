@@ -83,6 +83,7 @@ export default class AIOservice{
     this[key] = value;
   }
   getLoading = (id) => {
+    console.log(`aio-service show loading by ${id}`)
     return (`
       <div class="aio-service-loading" id="${id}">
         <div class="aio-service-loading-0">
@@ -240,26 +241,31 @@ export default class AIOservice{
     let result = await this.fetchData(service);
     result = this.validate(result,service);
     if(cache){this.storage.save({name:cache.name,value:result})}
-    if(onSuccess && typeof result !== 'string'){onSuccess(result);}
-    if(onError && typeof result === 'string'){onError(result);}
-    return result;
+    if(typeof result === 'string'){
+      if(onError){onError(result);}
+    }
+    else {
+      if(onSuccess){onSuccess(result);}
+      return result;
+    }
   }
 }
 
 
 function AIOServiceValidate({id,loader,getApiFunctions,cacheVersions}){
   let error;
-  if(typeof getApiFunctions !== 'function'){
-    error = `
-      aio-service with id:${id} error => missing getApiFunctions props. getAPiFunctions is a function that returns an object contain apiFunctions.
-    `
-  }
   if(typeof id !== 'string'){
     error = `
       aio-service with id:${id} error => id props should be an string
     `
   }
-  if(loader && typeof loader !== 'function'){
+  else if(typeof getApiFunctions !== 'function'){
+    error = `
+      aio-service with id:${id} error => missing getApiFunctions props. getAPiFunctions is a function that returns an object contain apiFunctions.
+    `
+  }
+  
+  else if(loader && typeof loader !== 'function'){
     error = `
       aio-service with id:${id} error => loader props should be a function
     `
